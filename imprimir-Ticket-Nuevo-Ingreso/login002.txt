@@ -1,0 +1,6 @@
+Sub Main()
+	Me.Ambiente.aTrabajo = Val2(txtFields(0))
+	Me.Ambiente.mTrabajo = Val2(txtFields(1)) 
+	'Se crea variable global para saber cuando fue su primer ingreso
+	Ambiente.var9 = True	
+End Sub

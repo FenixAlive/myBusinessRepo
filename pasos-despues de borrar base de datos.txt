@@ -1,0 +1,7 @@
+1-configurar Estacion 1
+2-Revisar que no se hayan borrado los descuentos del punto de venta 14
+3-Revisar que se mantenga el código de ventas acumuladas por dia
+4-revisar que se ponga en automatico el usuario en punto de venta 78
+5-revisar que se imprima el ticket en punto de venta 1 al entrar al punto de venta
+6-revisar que este dada de alta la varable global en login002
+7-revisar que no se haya borrado los datos del ticket encabezado y pie
