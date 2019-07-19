@@ -1,0 +1,96 @@
+'Por() Miguel Angel Mejia Zaragoza
+'Fecha: 7 de abril de 2011
+
+Sub Main()   
+     
+    ' Si la ventana va a aparecer maximizada
+    'Me.windowsMode = 0
+ 
+    Me.Caption = Ambiente.Empresa               
+ 
+    Me.formatoDeDinero = "##,##0.00"
+    Me.formatoDeDineroTotales = "##,##0.00"  
+    Me.formatoDeDescuento = "##,##0"
+
+    Version2005
+    Me.MaxPartidas = 8
+
+    ' Limpiamos los mensajes 
+    txtFields(3) = ""
+
+    ' La variable reload si es falsa indica que la ventana del punto de venta
+    ' todavia no realiza una venta
+    if Reload = False Then        
+       Ambiente.Tag = 2
+       Script.RunProcess "PUNTOV053", Parent, Ambiente 
+    end if
+
+    'txtFields(1) = Ambiente.Uid
+    fg2.Redraw = False
+    AjustaFlexGrid fg2
+    fg2.Redraw = True                   
+     
+    ' Coloca o quita la columna del impuesto                                    
+    'fg2.ColWidth(5) = 1000
+
+   	If Trim("" & Ambiente.rstEstacion("serieRemision")) = "" Then
+   		Me.consecutivoRemisiones = Ambiente.Estacion & "Remision"
+   	Else		
+   		Me.consecutivoRemisiones = Trim( "" & Ambiente.rstEstacion("serieRemision") ) & "Remision"
+   	End If
+
+   	If Trim("" & Ambiente.rstEstacion("serieTicket")) = "" Then
+		Me.consecutivoTickets = Ambiente.Estacion & "Ticket"
+   	Else
+   		Me.consecutivoTickets = Trim("" & Ambiente.rstEstacion("serieTicket")) & "Ticket"
+   	End If
+
+   	Me.serieFactura = Trim("" & Ambiente.rstEstacion("serieFactura"))
+   	Me.serieTicket = Trim("" & Ambiente.rstEstacion("serieTicket"))
+   	Me.serieRemision = Trim("" & Ambiente.rstEstacion("serieRemision"))
+
+    If Trim(Me.serieTicket) = "" Then
+    	Me.serieTicket = Ambiente.Estacion
+	End If
+
+	If Trim(Me.serieRemision) = "" Then
+      	Me.serieRemision = Ambiente.Estacion
+	End If
+   'Me.modeloScanner = "Scanner"
+   'Me.ActivaScannerOPOS
+
+   Me.usuarioRequerido = 0                      
+   fg2.ColWidth(18) = 0
+
+' aplicar descuento general del 25% los Lunes a todas las ventas
+dim DiaSemana
+
+DiaSemana = WeekDay(date)
+if DiaSemana = 2 then 
+	'msgbox("Lunes con descuento del 25%")
+	descuento = 25       
+else
+	descuento = 0
+end if
+
+End Sub
+
+
+
+
+
+Sub Version2005()
+
+    'Me.DevolverEfectivo = True 
+	Me.DevolverEfectivo = False
+                               
+    FormatoCantidad = "##,##0.000"                    
+    TimerComodin.Enabled = False   
+    TimerComodin.Interval = 4000
+    TimerComodin.Enabled = True
+
+    fg2.ColWidth(6) = 5000                
+    fg2.ColWidth(9) = 1200        
+
+
+End Sub
