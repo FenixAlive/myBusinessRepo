@@ -1,0 +1,4 @@
+1-punto de venta 1 quitar los cambios de ayer	-ok
+2-agregar en inicio001 la impresion del ticket nueva -ok
+3-reporte de existencia valuada (reportes->inventario general) -ok
+4-quitar la impresion de abrir caja en ticket (formatos del sistema->ticket)

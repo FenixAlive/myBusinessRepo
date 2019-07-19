@@ -63,47 +63,6 @@ Sub Main()
    Me.usuarioRequerido = 0                      
    fg2.ColWidth(18) = 0
 
-
-'//--------------------- comienza impresión de ticket por entrada a punto de venta 
-If Ambiente.var9 Then
-
-cLineaNueva = Chr(13) & Chr(10)
-cSalida = ""                                              
-
-'Encabezado
-cSalida = cSalida & cLineaNueva & cLineaNueva 
-'"CreaRecordSet()" consulta si el usuario colocó algun mensaje en el encabezado y pie del ticket a traves de la utileria "editar texto del ticket" y lo almacena en "rstTextTicket"
-Set rstTextTicket = CreaRecordSet( "SELECT * FROM tickettext", Ambiente.Connection ) 
-
-If rstTextTicket.EOF Then 
-	cSalida = cSalida & "" & Ambiente.Empresa & cLineaNueva 
-	cSalida = cSalida & "" & Trim( Ambiente.Direccion1 ) & cLineaNueva 
-	cSalida = cSalida & "" & Trim( Ambiente.Direccion2 ) & cLineaNueva 
-	cSalida = cSalida & "" & Trim( Ambiente.Telefonos ) & cLineaNueva 
-Else
-	cSalida = cSalida & rstTextTicket("textheader") 
-End If
-
-cSalida = cSalida & cLineaNueva & "  --------------------------------------------------" & cLineaNueva 
-
-Set fecha = Rst("select CURRENT_TIMESTAMP as fecha", Ambiente.Connection)   
-cSalida = cSalida & cLineaNueva & "        Ingreso de Cajero: "
-cSalida = cSalida & cLineaNueva & cLineaNueva
-cSalida = cSalida & "  Fecha y hora: " & Trim( fecha("fecha") )        
-cSalida = cSalida & cLineaNueva & cLineaNueva     
-cSalida = cSalida & "  Usuario: " & Trim( Ambiente.Uid )
-cSalida = cSalida & cLineaNueva        
-
-cSalida = cSalida & cLineaNueva & "  --------------------------------------------------" & cLineaNueva  
-
-
-	'msgbox cSalida    
-	PrintText cSalida
- 	Ambiente.var9 = False
-End If                                  
-
-'//-----------------------termina impresión de ticket por entrada a punto de venta
-
 End Sub
 
 
