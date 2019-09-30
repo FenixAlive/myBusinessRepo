@@ -1,5 +1,5 @@
-'//--------------------- comienza impresión de ticket por entrada a administracion
-If Ambiente.var9 Then
+'//--------------------- inicio001 comienza impresión de ticket por entrada a administracion
+If Ambiente.var9 = True Then
 
 cLineaNueva = Chr(13) & Chr(10)
 cSalida = ""                                              
