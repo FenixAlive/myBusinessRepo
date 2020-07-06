@@ -1,0 +1,19 @@
+1-cargar archivos .bfr dentro de programacion-ambiente de desarrollo
+	-CAMBIACLAVEIND
+	-descuentoEspecial.bfr
+
+2-cargar y correr archivo correspondiente ALTADESCESP_farmacia.paq dentro de personalizacion-procedimientos, clic derecho importar
+
+3-cargar INICIO001.paq y RUNBARRA.paq
+
+4-cargar puntov14v2
+-en san ignacio cambiar descuento a 27%
+-en tepa cargar codigo precio 2 metoprolol y porc menos 6 pesos de 5 a 10 art
+
+5-cargar formato ENTRADAS en personalizacion, formatos del sistema
+6-cargar reporte EXISTENCIA en personalizacion, reportes
+7-cargar reporte ENTRADASINV en personalizacion, reportes
+8-cargar reporte ASISTENCIAE en personalizacion, reportes
+
+llaves:
+puerta abajo: uno abajo, dos arriba, chica a medias, verde para la puerta de arriba

@@ -1,0 +1,124 @@
+CAMBIACLAVEIND
+Cambio de claves
+Forma==5400==3570==9375==5430====$$-$$TextBox==2970==330==2125==125==Clave====0$$-$$CommandButton==1755==750==125==2125==Aceptar==&Aceptar==2$$-$$Label==1200==210==255==120==Label==Clave anterior:==15$$-$$Label==1035==210==255==1125==lblLabel1==Nueva Clave:==16$$-$$TextBox==2970==315==2125==1000==ClaveNueva====1$$-$$CommandButton==1920==750==2625==2125==Cancelar==&Cancelar==14$$-$$Label==2865==210==255==630==labelAnt==No has seleccionado clave anterior==17$$-$$Label==2700==210==255==1620==labelNueva==No has seleccionado nueva clave==18$$-$$
+Sub Form_load()
+    Caption = "Cambio de clave de Producto"    
+    Controles("Cancelar").Cancel = True
+End Sub
+
+Sub Button_Click
+    Select Case ControlEvento.Tag
+           Case "Aceptar"
+                if CambiaClave( Controles("Clave"), Controles("ClaveNueva") ) Then
+     				msgbox "Clave cambiada correctamente"              
+					DescargaForma 
+                end if
+           Case "Cancelar" 
+                DescargaForma
+    End Select 
+
+End Sub
+
+
+
+
+Public Function CambiaClave( cClaveActual, cClaveNueva )
+
+    CambiaClave = False
+
+    if clEmpty( (cClaveActual) ) Then
+       MsgBox "Es necesario indicar la clave actual", vbInformation
+       Exit Function
+    end if
+
+    if clEmpty( (cClaveNueva) ) Then
+       MsgBox "Es necesario indicar la clave nueva", vbInformation
+       Exit Function
+    end if
+
+    Set rstClaveAdd = CreaRecordSet( "SELECT articulo FROM prods WHERE articulo = '" & cClaveNueva & "'", Ambiente.Connection )
+
+    if Not rstClaveAdd.EOF Then
+       MsgBox "La clave nueva ya existe en el catálogo no se puede registrar"
+       Exit Function
+    end if
+	
+	Set rstClaveExistenciaAlmacen = CreaRecordSet( "SELECT articulo FROM existenciaalmacen WHERE articulo = '" & cClaveNueva & "'", Ambiente.Connection )
+
+	if Not rstClaveExistenciaAlmacen.EOF Then
+       MsgBox "La clave nueva ya existe en el catálogo de Existencia de Almacen, corrija el nuevo numero de producto en la entrada de inventario"
+       Exit Function
+    end if
+
+    Ambiente.Connection.Execute "UPDATE asociados SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"
+    Ambiente.Connection.Execute "UPDATE asociados SET padre = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"
+    Ambiente.Connection.Execute "UPDATE componen SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"
+    Ambiente.Connection.Execute "UPDATE comppart SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"
+    Ambiente.Connection.Execute "UPDATE comppart SET componente = '" & cClaveNueva & "' WHERE componente = '" & cClaveActual & "'"
+    Ambiente.Connection.Execute "UPDATE pedpar SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"
+    Ambiente.Connection.Execute "UPDATE entpart SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"
+    Ambiente.Connection.Execute "UPDATE movsinv SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"
+    Ambiente.Connection.Execute "UPDATE ordpar SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"
+    Ambiente.Connection.Execute "UPDATE partcomp SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"
+    Ambiente.Connection.Execute "UPDATE partinv SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"
+    Ambiente.Connection.Execute "UPDATE partvta SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"
+    Ambiente.Connection.Execute "UPDATE prods SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"
+    Ambiente.Connection.Execute "UPDATE salpart SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"
+    Ambiente.Connection.Execute "UPDATE series SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"
+    Ambiente.Connection.Execute "UPDATE pendient SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"
+    Ambiente.Connection.Execute "UPDATE oppart SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"
+    Ambiente.Connection.Execute "UPDATE clavesadd SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"
+	Ambiente.Connection.Execute "UPDATE existenciaalmacen SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"
+	Ambiente.Connection.Execute "UPDATE movsinv SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"
+	Ambiente.Connection.Execute "UPDATE movsuc SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"
+	Ambiente.Connection.Execute "UPDATE descuentoEspecial SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"
+    Ambiente.Connection.Execute "UPDATE ofertas SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"
+ 	Ambiente.Connection.Execute "UPDATE ordauto SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"   
+    Ambiente.Connection.Execute "UPDATE ordpar SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"
+    Ambiente.Connection.Execute "UPDATE PartidasMalla SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"
+	Ambiente.Connection.Execute "UPDATE partinvclaveadd SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"    
+	Ambiente.Connection.Execute "UPDATE partvtaopciones SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"    
+	Ambiente.Connection.Execute "UPDATE pedpar SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'"    
+	Ambiente.Connection.Execute "UPDATE pedrecurrente SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'" 
+	Ambiente.Connection.Execute "UPDATE pendient SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'" 
+	Ambiente.Connection.Execute "UPDATE precios SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'" 
+	Ambiente.Connection.Execute "UPDATE puntos SET articulo = '" & cClaveNueva & "' WHERE articulo = '" & cClaveActual & "'" 
+
+
+
+
+	CambiaClave = True
+
+End Function
+
+
+Sub Text_Change()
+	Select Case ControlEvento.Tag
+           Case "Clave"
+				if Clave.text <> "" then
+					Set rstArt = CreaRecordSet( "SELECT articulo, descrip FROM prods WHERE articulo = '" & Val2(Clave.text) & "'", Ambiente.Connection )
+					if Val2(rstArt("articulo")) = Val2(Clave.text) then           	
+						labelAnt = rstArt("descrip")
+					else
+						labelAnt = "La clave anterior no existe" 
+					end if
+				else
+					labelAnt = "No has seleccionado clave anterior"
+				end if
+           Case "ClaveNueva"
+				if ClaveNueva.text <> "" then
+					Set rstArt = CreaRecordSet( "SELECT articulo, descrip FROM prods WHERE articulo = '" & Val2(ClaveNueva.text) & "'", Ambiente.Connection )
+					if Not rstArt.EOF Then
+      					labelNueva = "Cambiala, existente: "+rstArt("descrip")
+					else
+						labelNueva = "ok" 
+					end if
+				else
+			    	labelNueva = "No has seleccionado nueva clave"
+				end if
+    End Select
+ 
+End Sub 
+
+
+
