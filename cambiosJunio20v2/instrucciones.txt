@@ -14,6 +14,3 @@
 6-cargar reporte EXISTENCIA en personalizacion, reportes
 7-cargar reporte ENTRADASINV en personalizacion, reportes
 8-cargar reporte ASISTENCIAE en personalizacion, reportes
-
-llaves:
-puerta abajo: uno abajo, dos arriba, chica a medias, verde para la puerta de arriba
