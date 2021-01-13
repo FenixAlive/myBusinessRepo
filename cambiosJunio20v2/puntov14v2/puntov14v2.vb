@@ -47,7 +47,7 @@ Sub CambiaPrecioDos(porcGlob)
 		If clEmpty( fg2.TextMatrix( n, 0 ) ) Then
        			Exit For
        	End If
-		cantPrecioDos = CreaRecordSet( "SELECT C2 FROM prods where articulo = cast(" & fg2.TextMatrix( n, 0 ) & " AS nvarchar(30))", Ambiente.Connection )
+		cantPrecioDos = CreaRecordSet( "SELECT C2 FROM prods where articulo = cast('" & fg2.TextMatrix( n, 0 ) & "' AS nvarchar(30))", Ambiente.Connection )
 		cantPrecioDos = Val2(cantPrecioDos(0))
 		if fg2.TextMatrix( n, 1 ) >= cantPrecioDos  and cantPrecioDos > 0 then
 			if porcGlob = 0 and (Val2(fg2.TextMatrix( n, 1 )) Mod Val2(cantPrecioDos)) = 0 then
@@ -55,10 +55,10 @@ Sub CambiaPrecioDos(porcGlob)
 			else
 				numLista = 1
     		end if
-			precio = CreaRecordSet( "SELECT PRECIO" & numLista & " FROM prods where articulo = cast(" & fg2.TextMatrix( n, 0 ) & " AS nvarchar(30))", Ambiente.Connection )
+			precio = CreaRecordSet( "SELECT PRECIO" & numLista & " FROM prods where articulo = cast('" & fg2.TextMatrix( n, 0 ) & "' AS nvarchar(30))", Ambiente.Connection )
 			precio = Val2(precio(0))
 			fg2.TextMatrix(n, 2) = precio
-			Ambiente.Connection.Execute "UPDATE partvta SET precio = " & precio & ", lista = " & numLista & " WHERE (venta = " & venta & " AND ARTICULO = cast(" & fg2.TextMatrix( n, 0 ) & " AS nvarchar(30)) AND cast(cantidad as int) = " & fg2.TextMatrix( n, 1 ) & ")"
+			Ambiente.Connection.Execute "UPDATE partvta SET precio = " & precio & ", lista = " & numLista & " WHERE (venta = " & venta & " AND ARTICULO = cast('" & fg2.TextMatrix( n, 0 ) & "' AS nvarchar(30)) AND cast(cantidad as int) = " & fg2.TextMatrix( n, 1 ) & ")"
 			flagCalcular = 1
     	end if
 	Next
@@ -93,7 +93,7 @@ Sub DescuentoFnc(porcGlob)
 				end If
 			end if
 			' revisar si el articulo tiene descuento especial
-			Set descuentoEsp = CreaRecordSet( "SELECT * from descuentoEspecial where ARTICULO = cast(" & fg2.TextMatrix( n, 0 ) & " AS nvarchar(30))", Ambiente.Connection )
+			Set descuentoEsp = CreaRecordSet( "SELECT * from descuentoEspecial where ARTICULO = cast('" & fg2.TextMatrix( n, 0 ) & "' AS nvarchar(30))", Ambiente.Connection )
 			if Val2(descuentoEsp("articulo")) <> 0 then
 				if descuentoEsp("pocoDesc") then
 					if Val2(descuentoEsp("descuento")) < porcGlob then
@@ -112,13 +112,13 @@ Sub DescuentoFnc(porcGlob)
 					descFin = descFin * (desLimite-(montoAcum-montoSinDes)) / montoSinDes
 				else
 					descFin = 0
-            	end if
+        end if
 			end if
 			' actualizar descuento
 			if	Val2(fg2.TextMatrix( n, 3 )) <> Val2(descFin) then
 				'msgBox fg2.TextMatrix( n, 6)
         		fg2.TextMatrix( n, 3 ) = descFin
-				Ambiente.Connection.Execute "UPDATE partvta SET descuento = " & descFin & " WHERE (venta = " & venta & " AND ARTICULO = cast(" & fg2.TextMatrix( n, 0 ) & " AS nvarchar(30)))"
+				Ambiente.Connection.Execute "UPDATE partvta SET descuento = " & descFin & " WHERE (venta = " & venta & " AND ARTICULO = cast('" & fg2.TextMatrix( n, 0 ) & "' AS nvarchar(30)))"
 				flagCalcular = 1
 			end if
       	Next

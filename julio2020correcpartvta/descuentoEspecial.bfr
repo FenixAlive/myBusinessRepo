@@ -1,0 +1,151 @@
+descuentoEspecial
+
+Forma==9870==7920==9375==5430====$$-$$DBList==4005==255==630==245745==DBLista====8$$-$$Grid==9200==4500==250==750==Grid====5$$-$$CheckBox==1700==300==250==6375==chkPocoDes==Poco Descuento==3$$-$$TextBox==2000==345==1250==250==entryArt====2$$-$$CommandButton==4000==350==125==6875==btnConsultar==Consultar Articulos Actuales==0$$-$$Label==900==195==255==255==labelArt==# Articulo:==1$$-$$CommandButton==5000==350==4500==6875==btnCancelar==Salir==14$$-$$TextBox==1600==345==3250==6375==entryPocoDes====15$$-$$Label==3285==195==255==6000==labelRes==No Has Seleccionado Ningun Articulo.==16$$-$$CommandButton==1000==350==8375==250==btnBuscar==Buscar==17$$-$$CommandButton==3000==350==250==5500==btnSelecArt==seleccionar Articulo==18$$-$$TextBox==3300==345==4875==250==entryDescrip====19$$-$$Label==1410==195==3375==255==labelDescrip==y/o Descripción:==20$$-$$CommandButton==4000==350==3375==5500==btnAlta==Activar==21$$-$$CommandButton==4000==350==5500==5500==btnMod==Modificar==22$$-$$CommandButton==4000==350==5500==6375==btnBaja==Desactivar==23$$-$$Label==990==195==2130==6375==labelPorc==Porcentaje:==24$$-$$Label==150==195==4995==6375==labelPorcBoni==%==25$$-$$
+Dim codigoArt
+Dim descArt
+Sub form_load()
+	Me.Caption = "Descuentos especiales"   
+	btnCancelar.Cancel = True
+	Limpiar()
+	'Controles("entryArt").SetFocus
+End Sub
+
+Sub Button_click()
+    Select Case ControlEvento.Tag
+    		Case "btnConsultar"
+				llenaGridDes()
+			Case "btnBuscar"
+				llenarGrid()
+			Case "btnSelecArt"
+          		SeleccionasteArt()
+			Case "btnAlta"
+				execSQL "INSERT into descuentoEspecial values( cast('"& codigoArt &"' AS nvarchar(30)), cast("& chkPocoDes.Value &" AS bit), cast("& entryPocoDes &" AS float))"
+				Limpiar()
+				msgBox "Articulo: "&codigoArt&", "& descArt & ", Activado Correctamente"
+			Case "btnMod"
+				execSQL "UPDATE descuentoEspecial SET pocoDesc = cast("& chkPocoDes.Value &" AS bit), descuento = cast("& entryPocoDes &" AS float) WHERE articulo = cast('"& codigoArt &"' AS nvarchar(30))"
+			    Limpiar()
+				msgBox "Articulo: "&codigoArt&", "& descArt & ", Modificado Correctamente"
+			Case "btnBaja"
+				execSQL "DELETE from descuentoEspecial where articulo = cast('"& codigoArt &"' AS nvarchar(30))"
+				Limpiar()
+				msgBox "Articulo: "&codigoArt&", "& descArt & ", Desactivado Correctamente"	
+    		Case "btnCancelar"
+            	DescargaForma
+    End Select
+End Sub 
+
+
+Sub Check_click()
+	entryPocoDes = 0
+	if chkPocoDes.Value then
+		Controles("entryPocoDes").Locked = False
+	else
+       Controles("entryPocoDes").Locked = True
+	end if
+End Sub 
+
+Sub Text_KeyDown()
+	if KeyCode = 13 then
+		llenarGrid()
+  	end if
+End Sub 
+
+Sub llenarGrid()
+	Dim s 
+    Limpiar()
+   s = ""
+   s = s & "SELECT "
+   s = s & "  articulo, "
+   s = s & "  RTRIM(LTRIM(prods.descrip)) As 'Descripción' , " 
+   s = s & "  prods.precio1 * ( 1 + (impuestos.valor / 100) ) As 'Precio', " 
+   s = s & "  existencia " 
+   s = s & "FROM prods INNER JOIN impuestos ON prods.impuesto = impuestos.impuesto "
+	if entryArt.text <> "" then
+   		s = s & "WHERE prods.articulo LIKE '%" & Replace( entryArt.text, " ", "%" ) & "%'"
+		if entryDescrip.text <> "" then
+			s = s & "OR prods.descrip LIKE '%" & Replace( entryDescrip.text, " ", "%" ) & "%'"
+		end if 
+	elseif entryDescrip.text <> "" then
+		s = s & "WHERE prods.descrip LIKE '%" & Replace( entryDescrip.text, " ", "%" ) & "%'"
+	end if
+   s = s & "ORDER BY prods.articulo"
+   fillGrid (s)
+end Sub
+
+Sub Grid_KeyDown()
+    if KeyCode = 13 then
+        SeleccionasteArt()
+  	end if               
+End Sub
+
+Sub llenaGridDes()
+	Dim s
+	Limpiar()
+   	s = ""
+   	s = s & "SELECT "
+   	s = s & "descuentoEspecial.ARTICULO AS '# Articulo', RTRIM(LTRIM(prods.descrip)) As 'Descripción', descuentoEspecial.descuento AS '% Descuento' "
+   	s = s & "FROM descuentoEspecial INNER JOIN prods ON descuentoEspecial.ARTICULO = prods.articulo"
+	s = s & " ORDER BY descuentoEspecial.articulo"
+   	fillGrid (s)
+End Sub
+
+Sub SeleccionasteArt()
+	if Grid.Rows > 0 then
+	if Grid.Cell( Grid.SelectedRow, 1 ).Text <> "" then
+	Dim btnVisible
+	chkPocoDes.Value = 0
+	labelPorc.Visible = True 
+	labelPorcBoni.Visible = True
+	Controles("entryPocoDes").Locked = True 
+	entryPocoDes = 0
+	Controles("chkPocoDes").Visible = True
+	Controles("entryPocoDes").Visible = True 
+	labelRes =  "Articulo Seleccionado: "+Grid.Cell( Grid.SelectedRow, 1 ).Text + ", "+Grid.Cell( Grid.SelectedRow, 2 ).Text
+	Set codeArt = CreaRecordSet("SELECT * from descuentoEspecial WHERE articulo = cast("& Grid.Cell( Grid.SelectedRow, 1 ).Text &" AS nvarchar(30))", Ambiente.Connection)
+	codigoArt = Grid.Cell( Grid.SelectedRow, 1 ).Text
+	descArt = Grid.Cell( Grid.SelectedRow, 2 ).Text
+	if Val2(codeArt(0)) <> 0 then
+		if Val2(codeArt(1)) then
+			chkPocoDes.Value = 1
+			Controles("entryPocoDes").Locked = False
+			entryPocoDes = Val2(codeArt(2))
+		end if 
+		Controles("btnAlta").Visible = False
+		Controles("btnMod").Visible = True
+		Controles("btnBaja").Visible = True
+	else  
+		Controles("btnAlta").Visible = True
+		Controles("btnMod").Visible = False
+		Controles("btnBaja").Visible = False
+	end if
+	
+	end If
+	end If 
+End Sub 
+
+Sub execSQL( strSQL )
+ 
+    On Error Resume Next                              
+    Ambiente.Connection.Execute (strSQL)
+ 
+    If Err.Number <> 0 Then
+       MyMessage (strSQL) & " --- " & Err.Description & vbCrLf
+    End If
+
+End Sub
+
+Sub Limpiar()
+	Grid.Clear()
+	Controles("chkPocoDes").Visible = False
+	Controles("entryPocoDes").Visible = False
+	Controles("entryPocoDes").Locked = True
+	entryPocoDes = 0
+	Controles("btnAlta").Visible = False
+	Controles("btnMod").Visible = False
+	Controles("btnBaja").Visible = False
+	labelRes = "No has seleccionado ningun Articulo."
+	labelPorc.Visible = False 
+	labelPorcBoni.Visible = False
+End Sub
+

@@ -1,0 +1,73 @@
+#ir a datos -> conexiones -> propiedades -> definición
+
+#Cadena de conexión
+DRIVER=SQL Server;SERVER=localhost\SQLEXPRESS;UID=luisMunoz;Trusted_Connection=Yes;APP=Microsoft Office 2013;WSID=1234;DATABASE=master
+
+#texto de comando
+
+SELECT V28.ARTICULO AS ARTICULO, V28.DESCRIP AS DESCRIPCION, V28.Ventas AS VENTAS_6_meses
+  , ISNULL(V7.Ventas,0) AS VENTAS_7_DIAS 
+  , V28.Existencia AS EXISTENCIA
+  , CAST (ISNULL(EXISTENCIA*183/NULLIF(V28.Ventas,0),0) AS INT) AS DIAS_REST_EXIST FROM
+ (SELECT pv.ARTICULO, sum(pv.CANTIDAD) as Ventas, prods.descrip, ISNULL(prods.existencia,0) as Existencia
+  FROM [C:\MyBusinessDatabase\MyBusinessPOS2011.mdf].[dbo].[partvta] pv
+  LEFT JOIN [C:\MyBusinessDatabase\MyBusinessPOS2011.mdf].[dbo].[prods] prods on pv.ARTICULO = prods.ARTICULO
+  where pv.UsuFecha >= cast(current_timestamp-183 as datetime) and pv.UsuFecha <= cast(current_timestamp as datetime)
+  group by pv.ARTICULO, prods.DESCRIP, prods.EXISTENCIA) V28
+ LEFT JOIN   
+ (SELECT sum(pv.CANTIDAD) as Ventas, 
+ PV.ARTICULO
+ FROM [C:\MyBusinessDatabase\MyBusinessPOS2011.mdf].[dbo].[partvta] pv
+ where pv.UsuFecha >= cast(current_timestamp-7 as datetime) and pv.UsuFecha <= cast(current_timestamp as datetime)
+ group by pv.ARTICULO) V7
+ ON (V7.ARTICULO = V28.ARTICULO)
+ where V28.Ventas <> 0
+ order by V28.Ventas DESC, EXISTENCIA ASC;
+
+#si no funciona lo anterior abrir un nuevo archivo de excel:
+Datos->de otras fuentes -> desde microsoft query -> nuevo origen de datos -> aceptar -> dar nombre -> en controlador poner SQL Server -> conectar -> localhost\SQLEXPRESS -> quitar conexión de confianza -> id: sa -> contraseña: 12345678 -> aceptar -> en tabla dejar en blanco -> aceptar -> aceptar -> cancelar en donde elijes columnas -> si consultar sql -> cerrar ventana de agregar tablas -> click en sql en herramientas de la nueva ventana -> poner instrucción sql -> cerrar ventana y poner en tabla
+# despues ir a macros y crear la macro copiando lo siguiente en el worksheet
+
+#modificar el macro iniciar
+
+Private Sub Workbook_Open()
+    iniciar
+End Sub
+
+Private Sub Workbook_PivotTableCloseConnection(ByVal Target As PivotTable)
+    iniciar
+End Sub
+
+Private Sub Workbook_SheetChange(ByVal Sh As Object, ByVal Target As Range)
+    iniciar
+End Sub
+
+Private Sub Workbook_SheetTableUpdate(ByVal Sh As Object, ByVal Target As TableObject)
+    iniciar
+End Sub
+
+Sub iniciar()
+    ActiveSheet.Range(Cells(2, "A"), Cells(ActiveSheet.Range("A1").End(xlDown).Row, "F")).Select
+    Selection.Interior.ColorIndex = xlNone
+    Selection.Font.Color = RGB(30, 30, 30)
+    Selection.Font.Bold = False
+    For i = 2 To ActiveSheet.Range("A1").End(xlDown).Row
+        If ActiveSheet.Cells(i, "E") = 0 Then
+            ActiveSheet.Range(Cells(i, "A"), Cells(i, "F")).Interior.Color = RGB(230, 90, 90)
+            ActiveSheet.Range(Cells(i, "A"), Cells(i, "F")).Font.Color = RGB(230, 230, 230)
+            ActiveSheet.Range(Cells(i, "A"), Cells(i, "F")).Font.Bold = True
+        ElseIf ActiveSheet.Cells(i, "E") = 1 Then
+            ActiveSheet.Range(Cells(i, "A"), Cells(i, "F")).Interior.Color = RGB(90, 90, 230)
+            ActiveSheet.Range(Cells(i, "A"), Cells(i, "F")).Font.Color = RGB(230, 230, 230)
+            ActiveSheet.Range(Cells(i, "A"), Cells(i, "F")).Font.Bold = True
+        ElseIf ActiveSheet.Cells(i, "C") = 0 Then
+            ActiveSheet.Range(Cells(i, "A"), Cells(i, "F")).Interior.Color = RGB(230, 230, 90)
+        ElseIf ActiveSheet.Cells(i, "D") * 4 / ActiveSheet.Cells(i, "C") < 0.5 Then
+            ActiveSheet.Range(Cells(i, "A"), Cells(i, "F")).Interior.Color = RGB(230, 230, 90)
+        End If
+    Next i
+    For i = ActiveSheet.Range("A1").End(xlDown).Row + 1 To 10000
+            ActiveSheet.Range(Cells(i, "A"), Cells(i, "F")).Interior.Color = xlNone
+    Next i
+    ActiveSheet.Range("A2").Select
+End Sub

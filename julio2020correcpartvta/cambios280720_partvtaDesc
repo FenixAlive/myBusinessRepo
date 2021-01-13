@@ -1,0 +1,44 @@
+-(corregir) hacer query para ver todas las partvta que empiezan el articulo con 0 ver sus tikets y si tenia descuento y no se le aplicó aplicarlo
+-buscarlas
+SELECT venta, usuFecha, ARTICULO, OBSERV, PRECIO, DESCUENTO, IMPUESTO FROM [C:\MyBusinessDatabase\MyBusinessPOS2011.mdf].[dbo].[partvta]
+where (articulo like '[0]%') and UsuFecha between '01/06/2020' and CURRENT_TIMESTAMP
+
+-hacer el cambio
+UPDATE [C:\MyBusinessDatabase\MyBusinessPOS2011.mdf].[dbo].[partvta] SET descuento = 15 WHERE (venta = 71361 AND ARTICULO = cast('070330717534' AS nvarchar(30)))
+
+-cambio al código:
+
+-en la función:
+	Sub CambiaPrecioDos(porcGlob)
+-al momento de buscar el producto:
+		cantPrecioDos = CreaRecordSet( "SELECT C2 FROM prods where articulo = cast('" & fg2.TextMatrix( n, 0 ) & "' AS nvarchar(30))", Ambiente.Connection )
+-al momento de buscar el precio:
+			precio = CreaRecordSet( "SELECT PRECIO" & numLista & " FROM prods where articulo = cast('" & fg2.TextMatrix( n, 0 ) & "' AS nvarchar(30))", Ambiente.Connection )
+-al momento de actualizar la venta
+			Ambiente.Connection.Execute "UPDATE partvta SET precio = " & precio & ", lista = " & numLista & " WHERE (venta = " & venta & " AND ARTICULO = cast('" & fg2.TextMatrix( n, 0 ) & "' AS nvarchar(30)) AND cast(cantidad as int) = " & fg2.TextMatrix( n, 1 ) & ")"
+
+-en la función:
+	Sub DescuentoFnc(porcGlob)                   
+-al momento de buscar el descuentoEsp
+			Set descuentoEsp = CreaRecordSet( "SELECT * from descuentoEspecial where ARTICULO = cast('" & fg2.TextMatrix( n, 0 ) & "' AS nvarchar(30))", Ambiente.Connection )
+-al momento de hacer el descuento comilla simple en el articulo
+				Ambiente.Connection.Execute "UPDATE partvta SET descuento = " & descFin & " WHERE (venta = " & venta & " AND ARTICULO = cast('" & fg2.TextMatrix( n, 0 ) & "' AS nvarchar(30)))"
+
+Tepatitlan, cambios descuentos a partvta:
+	71413- articulo: 008400007261 1 a $32 desc 15% 
+	71421- articulo: 008400007261 2 a $32 desc 15%
+	71470- articulo: 008400007261 1 a $32 desc 15%
+
+San Ignacio:
+	72554 012388000305 1
+	72276 012388000305 1
+	72425 008400007261 1
+	72422 008400007261 1
+	72339 008400007261 1
+	72217 070330717534 1
+	72227 070330717534 2
+	72278 070330717534 6
+	72340 070330717534 2
+	72408 070330717534 5
+	72409 070330717534 2
+	72487 070330717534 2
