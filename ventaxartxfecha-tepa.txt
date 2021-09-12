@@ -1,0 +1,123 @@
+ 'tepa
+Sub Main()
+
+    ' Colocamos los datos del rango
+    ParamData.ParametrosRequeridos _
+       "Articulos por descripción",_
+       "Artículo Inicial" , _
+       "Articulos por descripción", _
+       "Artículo final",_
+       , _
+       , _
+       , _
+       ,_
+       True       
+
+    ' Mostramos la ventana de rangos
+    Rangos Ambiente, False
+
+    ' Si se presiono el boton cancelado detenemos la operación
+    if Cancelado Then
+       Exit Sub
+    end if
+
+    cCondicion = ""
+
+    if Not ParamData.Todos1 Then
+       cCondicion = cCondicion & " AND prods.descrip >= '" & ParamData.BusquedaIni & "' AND prods.descrip <= '" & ParamData.BusquedaFin & "'"
+       Reporte.Titulo2 = "Del siguiente rango de articulos " & Trim(ParamData.BusquedaIni) & " - " & Trim(ParamData.BusquedaFin)
+    End if 
+
+    if Not ParamData.TodasLasFechas Then
+       cCondicion = cCondicion & " AND ventas.f_emision >= " & FechaSQL(ParamData.FechaInicial, Ambiente.Connection) & " AND ventas.f_emision <= " & FechaSQL( ParamData.FechaFinal, Ambiente.Connection )
+       Reporte.Titulo2 = Reporte.Titulo2 & "Del día " & Formato(ParamData.FechaInicial, "dd-MM-yyyy") & " al día " & Formato(ParamData.FechaFinal, "dd-MM-yyyy")
+    End if                            
+
+    'LandScape
+
+    IniciaDocumento()
+          strSQL = "" 
+          strSQL = strSQL & "SELECT "  
+          strSQL = strSQL & "f_emision as 'Fecha', " 
+          strSQL = strSQL & "prods.descrip As 'Descripción', "
+          strSQL = strSQL & "partvta.articulo, "                   
+          strSQL = strSQL & "partvta.prdescrip, "
+          strSQL = strSQL & "SUM(  CASE WHEN ventas.tipo_doc = 'DV' OR ventas.tipo_doc = 'DEV' THEN CASE WHEN partvta.invent <> 0 THEN partvta.cantidad ELSE 0 END ELSE partvta.cantidad END ) AS cantvend, "
+          strSQL = strSQL & "SUM((partvta.precio * (partvta.cantidad - partvta.a01) * (1 - (partvta.descuento / 100)) * ventas.tipo_cam)) As 'Importe', "
+          strSQL = strSQL & "SUM((partvta.precio * (partvta.cantidad - partvta.a01) * (1 - (partvta.descuento / 100)) * ventas.tipo_cam) * (partvta.impuesto / 100) ) As Impuesto, "
+          strSQL = strSQL & "SUM( Cantidad ) As 'Total' "
+          strSQL = strSQL & "FROM (partvta INNER JOIN ventas ON ventas.venta = partvta.venta) INNER JOIN prods ON partvta.articulo = prods.articulo "
+          strSQL = strSQL & "WHERE ventas.estado = 'CO' AND (ventas.tipo_doc = 'FAC' Or ventas.tipo_doc = 'DV' Or ventas.tipo_doc = 'DEV' Or ventas.tipo_doc = 'REM') AND ventas.cierre = 0 "
+          strSQL = strSQL & cCondicion & " "
+          strSQL = strSQL & "GROUP BY partvta.clave, partvta.articulo, prods.descrip,partvta.prdescrip, prods.descrip, f_emision "
+          strSQL = strSQL & "ORDER BY f_emision, prods.descrip "
+          Reporte.SQL = strSQL 
+          Reporte.Titulo = "Ventas por Artículo por Fecha"
+          Reporte.RetrieveColumns                                      
+
+          Reporte.Columns("articulo").Font = "Courier New"           
+          Reporte.Columns("articulo").FontSize = 7 
+           
+          Reporte.Columns("Fecha").Grupo = True
+          Reporte.Columns("Fecha").GrupoTitulo = "Fecha: "
+          Reporte.Columns("Fecha").GrupoData = Prepara("ResultSet('Fecha')")
+          Reporte.Columns("Fecha").GrupoTotales = True
+          Reporte.Columns("Fecha").Visible = False  
+          Reporte.Columns("Fecha").GrupoTotalLeyenda = "Total por Fecha: "
+          Reporte.Columns("Fecha").Ancho = 1
+
+          Reporte.Columns("descripción").Ancho = 23
+          Reporte.Columns("descripción").Data = Prepara("Mid(Resultset('descripción'),1,35)")
+          Reporte.Columns("descripción").Font = "Courier New"           
+          Reporte.Columns("descripción").FontSize = 7 
+          
+          Reporte.Columns("prdescrip").Titulo = "Presentación"
+          Reporte.Columns("prdescrip").Ancho = 0
+          Reporte.Columns("prdescrip").Font = "Courier New"           
+          Reporte.Columns("prdescrip").FontSize = 7 
+          Reporte.Columns("prdescrip").Visible = False
+
+          Reporte.Columns("importe").Acumulado = True
+          Reporte.Columns("importe").Formato = Ambiente.FDinero
+          Reporte.Columns("importe").Font = "Courier New"           
+          Reporte.Columns("importe").FontSize = 7 
+          Reporte.Columns("importe").Ancho = 12
+          Reporte.Columns("importe").Anchocelda = 12
+
+          Reporte.Columns("Impuesto").Acumulado = True
+          Reporte.Columns("impuesto").Formato = Ambiente.FDinero
+          Reporte.Columns("Impuesto").Font = "Courier New"           
+          Reporte.Columns("impuesto").FontSize = 7 
+          Reporte.Columns("impuesto").Ancho = 12
+          Reporte.Columns("impuesto").Anchocelda = 12
+
+          Reporte.Columns("total").Acumulado = True
+          Reporte.Columns("total").Formato = Ambiente.FDinero
+          Reporte.Columns("total").Font = "Courier New"           
+          Reporte.Columns("total").FontSize = 7 
+          Reporte.Columns("total").Ancho = 12 
+          Reporte.Columns("total").Anchocelda = 12  
+          Reporte.Columns("total").AnchoTitulo = 10
+          Reporte.Columns("total").Data = Prepara( "ResultSet('importe') + ResultSet('impuesto')" )
+
+          Reporte.Columns("cantvend").Titulo = "Cantidad"
+          Reporte.Columns("cantvend").Formato = Ambiente.FDinero
+          Reporte.Columns("cantvend").Font = "Courier New"
+          Reporte.Columns("cantvend").FontSize = 7
+          Reporte.Columns("cantvend").Ancho = 7
+          Reporte.Columns("cantvend").AnchoCelda = 10
+          Reporte.Columns("cantvend").AnchoTitulo = 10
+          Reporte.Columns("cantvend").Align = 1
+
+          Reporte.ImprimeReporte
+
+    FinDocumento()
+
+End Sub
+
+
+
+
+
+
+

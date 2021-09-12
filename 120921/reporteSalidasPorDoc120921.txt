@@ -1,0 +1,108 @@
+Public Sub Main()
+
+    ' Colocamos los datos del rango
+    ParamData.ParametrosRequeridos ,,,,,,,,True 
+
+    ' Mostramos la ventana de rangos
+    Rangos Ambiente, False
+
+    ' Si se presiono el boton cancelado detenemos la operación
+    if Cancelado Then
+       Exit Sub
+    end if
+
+    if Not ParamData.TodasLasFechas Then
+       cCondicion = " AND salidas.f_emision >= " & FechaSQL(ParamData.FechaInicial, Ambiente.Connection) & " AND salidas.f_emision <= " & FechaSQL( ParamData.FechaFinal, Ambiente.Connection )
+       Reporte.Titulo2 = "Del día " & Formato(ParamData.FechaInicial, "dd-MM-yyyy") & " al día " & Formato(ParamData.FechaFinal, "dd-MM-yyyy")
+    End if
+
+    IniciaDocumento()
+
+          strSQL = "" 
+          strSQL = strSQL & "SELECT "
+          strSQL = strSQL & "salidas.tipo_doc AS 'DOCUMENTO', "
+          strSQL = strSQL & "salidas.salida AS 'NUMERO', "
+          strSQL = strSQL & "salidas.f_emision AS 'FECHA', "
+          strSQL = strSQL & "salidas.estado AS 'ESTATUS', "
+          strSQL = strSQL & "salpart.articulo AS 'Articulo', "    
+          strSQL = strSQL & "salpart.observ AS 'Descripción', "
+          strSQL = strSQL & "salpart.cantidad AS 'Cantidad', "
+          strSQL = strSQL & "salpart.precio AS 'Precio', "
+          strSQL = strSQL & "(salpart.precio * salpart.cantidad) AS 'Importe' "
+          strSQL = strSQL & "FROM salidas INNER JOIN salpart ON salidas.salida = salpart.salida "
+          strSQL = strSQL & "WHERE (salidas.estado = 'CO' Or salidas.estado = 'CA') "
+          strSQL = strSQL & cCondicion
+          strSQL = strSQL & "ORDER BY salidas.salida, salpart.observ "
+          Reporte.SQL = strSQL 
+          Reporte.Titulo = "Salidas al inventario"
+          Reporte.RetrieveColumns 
+
+          For n = 1 to Reporte.Columns.Count
+              Reporte.Columns(n).EColor = RGB( 100,100,100 )
+              Reporte.Columns(n).EColorCondition = Prepara("ResultSet('Estatus') = 'CA'")
+          Next
+          
+          Reporte.Columns("NUMERO").Grupo = True
+          Reporte.Columns("NUMERO").GrupoTitulo = "Numero Documento: "
+          Reporte.Columns("NUMERO").GrupoData = Prepara("ResultSet('Numero')")
+          Reporte.Columns("NUMERO").GrupoTotales = True
+          Reporte.Columns("NUMERO").Visible = False  
+          Reporte.Columns("NUMERO").GrupoTotalLeyenda = "Total por Documento: "
+          Reporte.Columns("NUMERO").Ancho = 1
+          
+          Reporte.Columns("DOCUMENTO").Grupo = True
+          Reporte.Columns("DOCUMENTO").GrupoTitulo = "Tipo Documento: "
+          Reporte.Columns("DOCUMENTO").GrupoTotales = False
+          Reporte.Columns("DOCUMENTO").Visible = False  
+          Reporte.Columns("DOCUMENTO").Ancho = 1
+
+		  Reporte.Columns("Fecha").Grupo = True
+          Reporte.Columns("Fecha").GrupoTitulo = "Fecha: "
+          Reporte.Columns("Fecha").GrupoTotales = False
+          Reporte.Columns("Fecha").Visible = False  
+          Reporte.Columns("Fecha").Ancho = 1
+          'Reporte.Columns("FECHA").Formato = "dd-MM-yyyy"
+          
+          Reporte.Columns("descripción").Ancho = 35
+          Reporte.Columns("descripción").Data = Prepara("Mid(Resultset('descripción'),1,60)")
+          Reporte.Columns("descripción").Font = "Courier New"           
+          Reporte.Columns("descripción").FontSize = 7
+		  Reporte.Columns("descripción").Visible = True
+
+          Reporte.Columns("Cantidad").Acumulado = True
+          Reporte.Columns("Cantidad").Formato = Ambiente.FDinero
+          Reporte.Columns("Cantidad").Font = "Courier New"
+          Reporte.Columns("Cantidad").FontSize = 7      
+          Reporte.Columns("Cantidad").Anchocelda = 11     
+          Reporte.Columns("Cantidad").Ancho = 8
+          Reporte.Columns("Cantidad").Econdition = Prepara("ResultSet('ESTATUS') = 'CO'")
+
+
+          Reporte.Columns("Precio").Acumulado = True
+          Reporte.Columns("Precio").Formato = Ambiente.FDinero
+          Reporte.Columns("Precio").Font = "Courier New"
+          Reporte.Columns("Precio").FontSize = 7      
+          Reporte.Columns("Precio").Anchocelda = 11     
+          Reporte.Columns("Precio").Ancho = 8
+          Reporte.Columns("Precio").Econdition = Prepara("ResultSet('ESTATUS') = 'CO'")
+
+
+          Reporte.Columns("Importe").Acumulado = True
+          Reporte.Columns("Importe").Formato = Ambiente.FDinero
+          Reporte.Columns("Importe").Font = "Courier New"
+          Reporte.Columns("Importe").FontSize = 7      
+          Reporte.Columns("Importe").Anchocelda = 11     
+          Reporte.Columns("Importe").Ancho = 8
+          Reporte.Columns("Importe").Econdition = Prepara("ResultSet('ESTATUS') = 'CO'")
+
+          'Reporte.Columns("Estatus").Titulo = "Est."
+          'Reporte.Columns("Estatus").Ancho = 5 
+		  Reporte.Columns("Estatus").Visible = False
+
+          Reporte.ImprimeReporte
+
+    FinDocumento()
+
+End Sub
+
+

@@ -1,0 +1,18 @@
+1-datos de empresa poner direcciones
+2-quitar de codigo direccion 1 y 2 en ticket
+3-poner codigo de direcciones en corte z
+
+4-reporte de salida modificar con nuevo
+5-poner drive en user\drive https://www.google.com/drive/download/
+6-poner programa que se ejecute al apagar compu
+
+7-reporte de ventas por articulo en arandas
+
+Pasos del punto 6-
+guardar .bat en c: para tener privilegios
+Step 2: Click on Start and under search, type in Task and click open Task Scheduler.
+clic en crear tarea basica
+elegir nombre de tarea, correr a las 3pm
+accion-start a programa
+seleccionar batch
+dar clic en mostrar propiedades al terminar y seleccionar privilegios mas altos
