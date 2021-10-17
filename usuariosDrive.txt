@@ -1,0 +1,15 @@
+#chona
+farmasimonenc@gmail.com
+DR_simon01_CONSTITUCION
+
+#San ignacio
+farmasimonsn@gmail.com
+DR_simon02_MORELOS
+
+#arandas
+farmasimonarn@gmail.com
+DR_simon03_ARTEAGA
+
+#tepa
+farmasimontp@gmail.com
+DR_simon04_HIDALGO

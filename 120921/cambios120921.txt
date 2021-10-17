@@ -1,10 +1,9 @@
 1-datos de empresa poner direcciones
-2-quitar de codigo direccion 1 y 2 en ticket
-3-poner codigo de direcciones en corte z
+2-checar codigos IMPRESION INCORRECTO en SAN NACHO y CHONA del corte z *pendiente
 
 4-reporte de salida modificar con nuevo
 5-poner drive en user\drive https://www.google.com/drive/download/
-6-poner programa que se ejecute al apagar compu
+6-poner programa que se ejecute
 
 7-reporte de ventas por articulo en arandas
 

@@ -1,0 +1,10 @@
+win+r
+regedit
+hkey_local_machine
+system
+currentcontrolset
+services
+usbstor
+to disable: 4
+enable: 3
+administrador de tareas -> windows explorer  -> restart

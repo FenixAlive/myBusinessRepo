@@ -1,4 +1,3 @@
-'ventas por articulo la chona
 Sub Main()
 
     ' Colocamos los datos del rango
@@ -37,7 +36,8 @@ Sub Main()
 
     IniciaDocumento()
           strSQL = "" 
-          strSQL = strSQL & "SELECT "
+          strSQL = strSQL & "SELECT "  
+          strSQL = strSQL & "f_emision as 'Fecha', " 
           strSQL = strSQL & "prods.descrip As 'Descripción', "
           strSQL = strSQL & "partvta.articulo, "                   
           strSQL = strSQL & "partvta.prdescrip, "
@@ -48,19 +48,25 @@ Sub Main()
           strSQL = strSQL & "FROM (partvta INNER JOIN ventas ON ventas.venta = partvta.venta) INNER JOIN prods ON partvta.articulo = prods.articulo "
           strSQL = strSQL & "WHERE ventas.estado = 'CO' AND (ventas.tipo_doc = 'FAC' Or ventas.tipo_doc = 'DV' Or ventas.tipo_doc = 'DEV' Or ventas.tipo_doc = 'REM') AND ventas.cierre = 0 "
           strSQL = strSQL & cCondicion & " "
-          strSQL = strSQL & "GROUP BY partvta.clave, partvta.articulo, prods.descrip,partvta.prdescrip "
-          strSQL = strSQL & "ORDER BY prods.descrip "
+          strSQL = strSQL & "GROUP BY partvta.clave, partvta.articulo, prods.descrip,partvta.prdescrip, prods.descrip, f_emision "
+          strSQL = strSQL & "ORDER BY f_emision, prods.descrip "
           Reporte.SQL = strSQL 
-          Reporte.Titulo = "Ventas por artículo"
+          Reporte.Titulo = "Ventas por Artículo por Fecha"
           Reporte.RetrieveColumns                                      
 
           Reporte.Columns("articulo").Font = "Courier New"           
-          Reporte.Columns("articulo").FontSize = 7   
-		    Reporte.Columns("articulo").Ancho = 12
-          Reporte.Columns("articulo").Anchocelda = 12
+          Reporte.Columns("articulo").FontSize = 7 
+           
+          Reporte.Columns("Fecha").Grupo = True
+          Reporte.Columns("Fecha").GrupoTitulo = "Fecha: "
+          Reporte.Columns("Fecha").GrupoData = Prepara("ResultSet('Fecha')")
+          Reporte.Columns("Fecha").GrupoTotales = True
+          Reporte.Columns("Fecha").Visible = False  
+          Reporte.Columns("Fecha").GrupoTotalLeyenda = "Total por Fecha: "
+          Reporte.Columns("Fecha").Ancho = 1
 
           Reporte.Columns("descripción").Ancho = 23
-          Reporte.Columns("descripción").Data = Prepara("Mid(Resultset('descripción'),1,50)")
+          Reporte.Columns("descripción").Data = Prepara("Mid(Resultset('descripción'),1,35)")
           Reporte.Columns("descripción").Font = "Courier New"           
           Reporte.Columns("descripción").FontSize = 7 
           
@@ -68,16 +74,7 @@ Sub Main()
           Reporte.Columns("prdescrip").Ancho = 0
           Reporte.Columns("prdescrip").Font = "Courier New"           
           Reporte.Columns("prdescrip").FontSize = 7 
-          Reporte.Columns("prdescrip").Visible = False        
-
-		  Reporte.Columns("cantvend").Titulo = "Cantidad"
-          Reporte.Columns("cantvend").Formato = Ambiente.FDinero
-          Reporte.Columns("cantvend").Font = "Courier New"
-          Reporte.Columns("cantvend").FontSize = 7
-          Reporte.Columns("cantvend").Ancho = 7
-          Reporte.Columns("cantvend").AnchoCelda = 9
-          Reporte.Columns("cantvend").AnchoTitulo = 10
-          Reporte.Columns("cantvend").Align = 1
+          Reporte.Columns("prdescrip").Visible = False
 
           Reporte.Columns("importe").Acumulado = True
           Reporte.Columns("importe").Formato = Ambiente.FDinero
@@ -90,20 +87,29 @@ Sub Main()
           Reporte.Columns("impuesto").Formato = Ambiente.FDinero
           Reporte.Columns("Impuesto").Font = "Courier New"           
           Reporte.Columns("impuesto").FontSize = 7 
-          Reporte.Columns("impuesto").Ancho = 9
-          Reporte.Columns("impuesto").Anchocelda = 9
+          Reporte.Columns("impuesto").Ancho = 12
+          Reporte.Columns("impuesto").Anchocelda = 12
 
           Reporte.Columns("total").Acumulado = True
           Reporte.Columns("total").Formato = Ambiente.FDinero
           Reporte.Columns("total").Font = "Courier New"           
           Reporte.Columns("total").FontSize = 7 
           Reporte.Columns("total").Ancho = 12 
-          Reporte.Columns("total").Anchocelda = 12
+          Reporte.Columns("total").Anchocelda = 12  
+          Reporte.Columns("total").AnchoTitulo = 10
           Reporte.Columns("total").Data = Prepara( "ResultSet('importe') + ResultSet('impuesto')" )
+
+          Reporte.Columns("cantvend").Titulo = "Cantidad"
+          Reporte.Columns("cantvend").Formato = Ambiente.FDinero
+          Reporte.Columns("cantvend").Font = "Courier New"
+          Reporte.Columns("cantvend").FontSize = 7
+          Reporte.Columns("cantvend").Ancho = 7
+          Reporte.Columns("cantvend").AnchoCelda = 10
+          Reporte.Columns("cantvend").AnchoTitulo = 10
+          Reporte.Columns("cantvend").Align = 1
 
           Reporte.ImprimeReporte
 
     FinDocumento()
 
 End Sub
-
